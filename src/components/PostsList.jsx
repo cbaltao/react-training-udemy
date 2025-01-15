@@ -1,23 +1,39 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLoaderData } from "react-router-dom";
 
 import Post from "./Post";
-import NewPost from "./NewPost";
-import Modal from "./Modal";
 import classes from "./PostsList.module.css";
 
-function PostsList({ isPosting, onStopPosting }) {
-  //[target, function to execute when target is modified]
-  const [enteredBody, setEnteredBody] = useState("");
-  const [enteredAuthor, setEnteredAuthor] = useState("");
+function PostsList() {
+  //fetch("http://localhost:8080/posts");
+  const [posts, setPosts] = useState([]);
 
-  function bodyChangeHandler(event) {
-    setEnteredBody(event.target.value);
+  const [isFetching, setIsFetching] = useState(false);
+
+  useEffect(() => {
+    async function fetchPosts() {
+      setIsFetching(true);
+      setPosts(resData.posts);
+      setIsFetching(false);
+    }
+
+    fetchPosts();
+  }, []);
+
+  /*
+  function addPostHandler(postData) {
+    //Post data will first be added to the array, the rest
+    //of the posts with follow.
+    //setPosts([postData, ...posts]);
+    fetch("http://localhost:8080/posts", {
+      method: "POST",
+      body: JSON.stringify(postData),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    setPosts((existingPosts) => [postData, ...existingPosts]);
   }
-
-  function authorChangeHandler(event) {
-    setEnteredAuthor(event.target.value);
-  }
-
   /*
   // Alternative Method: jsx in variable
   let modalContent = "";
@@ -38,19 +54,26 @@ function PostsList({ isPosting, onStopPosting }) {
 
   return (
     <>
-      {isPosting && (
-        <Modal onClose={onStopPosting}>
-          <NewPost
-            onBodyChange={bodyChangeHandler}
-            onAuthorChange={authorChangeHandler}
-          />
-        </Modal>
+      {!isFetching && posts.length > 0 && (
+        <ul className={classes.posts}>
+          {posts.map((post) => (
+            <Post key={post.body} author={post.author} body={post.body} />
+          ))}
+        </ul>
       )}
 
-      <ul className={classes.posts}>
-        <Post author={enteredAuthor} body={enteredBody} />
-        <Post author="Carlo" body="Lorem Ipsum" />
-      </ul>
+      {!isFetching && posts.length === 0 && (
+        <div style={{ textAlign: "center", color: "white" }}>
+          <h2>There are no post yet.</h2>
+          <p>Start adding some!</p>
+        </div>
+      )}
+
+      {isFetching && (
+        <div style={{ textAlign: "center", color: "white" }}>
+          <p>Loading posts...</p>
+        </div>
+      )}
     </>
   );
 }
