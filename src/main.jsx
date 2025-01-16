@@ -1,9 +1,12 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import Posts, { loader as postsLoader } from "../routes/Posts";
-import NewPost from "../routes/NewPost";
+import NewPost, { action as newPostAction } from "../routes/NewPost";
 import RootLayout from "../routes/RootLayout";
 import "./index.css";
+import PostDetails, {
+  loader as postDetailsLoader,
+} from "../routes/PostDetails";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
 const router = createBrowserRouter([
@@ -19,6 +22,12 @@ const router = createBrowserRouter([
           {
             path: "/create-post",
             element: <NewPost />,
+            action: newPostAction,
+          },
+          {
+            path: "/:id",
+            element: <PostDetails />,
+            loader: postDetailsLoader,
           },
         ],
       }, //<our-domain>
